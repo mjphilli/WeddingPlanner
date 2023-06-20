@@ -1,0 +1,14 @@
+@model List<Wedding>
+
+<h2 class="text-center">All Weddings</h2>
+
+@foreach (Wedding wedding in Model)
+{
+    <div class="card shadow rounded mx-auto w-75 mb-3">
+
+        <div class=card-body>
+            <p class="card-text"><a asp-controller="Wedding" asp-action="ViewWedding" asp-route-id="@wedding.WeddingId">@wedding.WedderOne</a></p>
+        </div>
+
+    </div>
+}
