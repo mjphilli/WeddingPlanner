@@ -37,7 +37,8 @@ public class UserController : Controller
         db.SaveChanges();
 
         HttpContext.Session.SetInt32("UserId", user.UserId);
-        return RedirectToAction("AllWeddings", "Wedding");
+        HttpContext.Session.SetString("FirstName", user.FirstName);
+        return RedirectToAction("Index", "Wedding");
     }
 
     [HttpPost("login")]
@@ -66,13 +67,13 @@ public class UserController : Controller
         }
 
         HttpContext.Session.SetInt32("UserId", dbUser.UserId);
+        HttpContext.Session.SetString("FirstName", dbUser.FirstName);
         return RedirectToAction("Index", "Wedding");
     }
 
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        // System.Console.WriteLine("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
         HttpContext.Session.Clear();
         return RedirectToAction("Index");
     }

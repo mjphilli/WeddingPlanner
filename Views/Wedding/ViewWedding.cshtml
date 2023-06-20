@@ -1,34 +1,20 @@
 @model Wedding
 
-<h1>@Model.WedderOne</h1>
+<h1>@Model.WedderOne & @Model.WedderTwo's Wedding</h1>
 
 <div class="row mt-5">
     <div class="col-md">
+        <h2>Date: @Model.WeddingDate?.Date</h2>
         <h2 class="text-center">Guests</h2>
         @foreach (Association association in Model.AllAssociations)
         {
             <div class="card shadow rounded mx-auto w-75 mb-3">
 
                 <div class=card-body>
-                    <p class="card-text">@association.User?.FirstName</p>
+                    <p class="card-text">@association.User?.FirstName @association.User?.LastName</p>
                 </div>
 
             </div>
         }
     </div>
-
-    @* <div class="col-md">
-        <form class="shadow p-3 rounded" asp-controller="Wedding" asp-action="UpdateCategories" asp-route-id="@Model.WeddingId" method="POST">
-            <h2 asp-for="" class="text-center">Add User</h2>
-            <span class="text-danger" asp-validation-for="Name"></span>
-            <select name="categoryId" class="form-control">
-                @foreach (User category in @ViewBag.missingcategories)
-                {
-                    <option value=@category.UserId>@category.Name</option>
-                }
-            </select>
-
-            <input type="submit" value="Add">
-        </form>
-    </div> *@
 </div>

@@ -10,33 +10,24 @@ public class Wedding
     public int WeddingId { get; set; }
 
     [Required(ErrorMessage = "is required")]
+    [Display(Name = "Wedder One")]
     public string WedderOne { get; set; }
 
     [Required(ErrorMessage = "is required")]
+    [Display(Name = "Wedder Two")]
     public string WedderTwo { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "is required")]
     [DataType(DataType.Date)]
     [Display(Name = "Date")]
-    [Future]
-    public DateTime WeddingDate { get; set; }
+    [Future(ErrorMessage = "Date must be in the future!")]
+    public DateTime? WeddingDate { get; set; }
 
     [Required(ErrorMessage = "is required")]
-    // [EmailAddress]
-    // [UniqueEmail]
     public string Address { get; set; }
-
-    // [Required(ErrorMessage = "is required")]
-    // [MinLength(8, ErrorMessage = "must be at least 8 characters.")]
-    // [DataType(DataType.Password)]
-    // public string Password { get; set; }
-
-    // [NotMapped]
-    // [DataType(DataType.Password)]
-    // [Compare("Password", ErrorMessage = "must match password.")]
-    // public string ConfirmPassword { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
+    public int UserId { get; set; }
     public List<Association> AllAssociations { get; set; } = new List<Association>();
 }
 

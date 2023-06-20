@@ -11,8 +11,8 @@ using WeddingPlanner.Models;
 namespace WeddingPlanner.Migrations
 {
     [DbContext(typeof(MyContext))]
-    [Migration("20230619235703_FirstMigration")]
-    partial class FirstMigration
+    [Migration("20230620195554_SeventhMigration")]
+    partial class SeventhMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,7 +27,7 @@ namespace WeddingPlanner.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.Property<int>("WeddingId")
@@ -91,6 +91,9 @@ namespace WeddingPlanner.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("WedderOne")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -99,7 +102,8 @@ namespace WeddingPlanner.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("WeddingDate")
+                    b.Property<DateTime?>("WeddingDate")
+                        .IsRequired()
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("WeddingId");
@@ -111,9 +115,7 @@ namespace WeddingPlanner.Migrations
                 {
                     b.HasOne("WeddingPlanner.Models.User", "User")
                         .WithMany("AllAssociations")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.HasOne("WeddingPlanner.Models.Wedding", "Wedding")
                         .WithMany("AllAssociations")

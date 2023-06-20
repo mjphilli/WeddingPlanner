@@ -6,6 +6,7 @@ using WeddingPlanner.Models;
 
 namespace WeddingPlanner.Controllers;
 
+[SessionCheck]
 public class WeddingController : Controller
 {
     private readonly ILogger<WeddingController> _logger;
@@ -17,12 +18,17 @@ public class WeddingController : Controller
         db = context;
     }
 
-    [SessionCheck]
     [HttpGet("weddings")]
     public IActionResult Index()
     {
-        List<Wedding> allWeddings = db.Weddings.ToList();
+        List<Wedding> allWeddings = db.Weddings.Include(wedding => wedding.AllAssociations).ToList();
         return View("AllWeddings", allWeddings);
+    }
+
+    [HttpGet("weddings/new")]
+    public IActionResult NewWedding()
+    {
+        return View("NewWedding");
     }
 
     [HttpPost("weddings/create")]
@@ -30,8 +36,10 @@ public class WeddingController : Controller
     {
         if (!ModelState.IsValid)
         {
-            return Index();
+            return View("NewWedding");
         }
+
+        newWedding.UserId = (int)HttpContext.Session.GetInt32("UserId");
 
         db.Weddings.Add(newWedding);
 
@@ -40,39 +48,65 @@ public class WeddingController : Controller
         return RedirectToAction("Index");
     }
 
-    // [HttpGet("weddings/{id}")]
-    // public IActionResult ViewWedding(int id)
-    // {
-    //     Wedding? wedding = db.Weddings.Include(wedding => wedding.AllAssociations).ThenInclude(association => association.Category)
-    //     .FirstOrDefault(wedding => wedding.WeddingId == id);
+    [HttpGet("weddings/{id}")]
+    public IActionResult ViewWedding(int id)
+    {
+        Wedding? wedding = db.Weddings.Include(wedding => wedding.AllAssociations).ThenInclude(association => association.User)
+        .FirstOrDefault(wedding => wedding.WeddingId == id);
 
-    //     ViewBag.missingcategories = db.Categories.Include(category => category.AllAssociations)
-    //     .Where(category => category.AllAssociations.All(association => association.WeddingId != id));
+        if (wedding == null)
+        {
+            return RedirectToAction("Index");
+        }
 
-    //     if (wedding == null)
-    //     {
-    //         return RedirectToAction("Index");
-    //     }
+        return View("ViewWedding", wedding);
+    }
 
-    //     return View("ViewWedding", wedding);
-    // }
+    [HttpPost("weddings/{id}")]
+    public IActionResult UpdateGuests(int id)
+    {
+        Association newAssociation = new Association()
+        {
+            UserId = HttpContext.Session.GetInt32("UserId"),
+            WeddingId = id
+        };
 
-    // [HttpPost("weddings/{id}")]
-    // public IActionResult UpdateCategories(int id, int categoryId)
-    // {
-    //     Association newAssociation = new Association()
-    //     {
-    //         WeddingId = id,
-    //         CategoryId = categoryId
-    //     };
+        db.Associations.Add(newAssociation);
 
-    //     db.Associations.Add(newAssociation);
+        db.SaveChanges();
 
-    //     db.SaveChanges();
+        return RedirectToAction("Index");
+    }
 
-    //     // return RedirectToAction("ViewWedding", id);
-    //     return ViewWedding(id);
-    // }
+    [HttpPost("weddings/{id}/unrsvp")]
+    public IActionResult UnRSVP(int id)
+    {
+        Association? newAssociation = db.Associations.FirstOrDefault(association => association.UserId == HttpContext.Session.GetInt32("UserId") && association.WeddingId == id);
+
+        if (newAssociation != null)
+        {
+            db.Associations.Remove(newAssociation);
+            db.SaveChanges();
+        }
+        
+        return RedirectToAction("Index");
+    }
+
+    // [SessionCheck]
+    [HttpPost("weddings/{id}/delete")]
+    public IActionResult Delete(int id)
+    {
+        Wedding wedding = db.Weddings.FirstOrDefault(wedding => wedding.WeddingId == id);
+
+        if (wedding != null && wedding.UserId == HttpContext.Session.GetInt32("UserId"))
+        {
+            db.Weddings.Remove(wedding);
+
+            db.SaveChanges();
+        }
+
+        return RedirectToAction("Index");
+    }
 
     public IActionResult Privacy()
     {
@@ -97,7 +131,7 @@ public class SessionCheckAttribute : ActionFilterAttribute
         {
             // Redirect to the Index page if there was nothing in session
             // "Home" here is referring to "HomeController", you can use any controller that is appropriate here
-            context.Result = new RedirectToActionResult("Index", "Home", null);
+            context.Result = new RedirectToActionResult("Index", "User", null);
         }
     }
 }

@@ -2,13 +2,48 @@
 
 <h2 class="text-center">All Weddings</h2>
 
-@foreach (Wedding wedding in Model)
-{
-    <div class="card shadow rounded mx-auto w-75 mb-3">
-
-        <div class=card-body>
-            <p class="card-text"><a asp-controller="Wedding" asp-action="ViewWedding" asp-route-id="@wedding.WeddingId">@wedding.WedderOne</a></p>
-        </div>
-
-    </div>
-}
+<table class="table">
+    <tr>
+        <th>Wedding of</th>
+        <th>Date</th>
+        <th>Guest Count</th>
+        <th>Action</th>
+    </tr>
+    @foreach (Wedding wedding in Model)
+    {
+        <tr>
+            <td><a asp-controller="Wedding" asp-action="ViewWedding" asp-route-id="@wedding.WeddingId">@wedding.WedderOne &
+                    @wedding.WedderTwo</a></td>
+            <td>@wedding?.WeddingDate</td>
+            <td>@wedding.AllAssociations.Count</td>
+            <td>
+                @{
+                    if (Context.Session.GetInt32("UserId") == wedding.UserId)
+                    {
+                        <form class="p-3 rounded" asp-controller="Wedding" asp-action="Delete" asp-route-id="@wedding.WeddingId"
+                            method="POST">
+                            <input type="submit" value="Delete">
+                        </form>
+                    }
+                    else
+                    {
+                        if (wedding.AllAssociations.Any(association => association.UserId == Context.Session.GetInt32("UserId")))
+                        {
+                            <form class="p-3 rounded" asp-controller="Wedding" asp-action="UnRSVP" asp-route-id="@wedding.WeddingId"
+                                method="POST">
+                                <input type="submit" value="Un-RSVP">
+                            </form>
+                        }
+                        else
+                        {
+                            <form class="p-3 rounded" asp-controller="Wedding" asp-action="UpdateGuests"
+                                asp-route-id="@wedding.WeddingId" method="POST">
+                                <input type="submit" value="RSVP">
+                            </form>
+                        }
+                    }
+                }
+            </td>
+        </tr>
+    }
+</table>
